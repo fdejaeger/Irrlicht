@@ -5,7 +5,10 @@
 #ifndef __I_IREFERENCE_COUNTED_H_INCLUDED__
 #define __I_IREFERENCE_COUNTED_H_INCLUDED__
 
+#include <map>
+#include <mutex>
 #include "irrTypes.h"
+#include <mutex>
 
 #ifdef _IRR_COMPILE_WITH_LEAK_HUNTER_
 	#include "leakHunter.h"
@@ -42,6 +45,59 @@ namespace irr
 	the name of the method does not start with 'create'. The texture
 	is stored somewhere by the driver.
 	*/
+
+	struct InstanceCounterInfo {
+		int totalInstance;
+		int liveInstance;
+		std::mutex mutex;
+		std::string name;
+	};
+	extern std::mutex globalInstanceCounterMutex;
+	extern std::map<size_t, InstanceCounterInfo*> globalInstanceInfoMap;
+
+	template<typename T>
+	class InstanceCounter
+	{
+	public:
+
+		static InstanceCounterInfo info;
+
+		InstanceCounter()
+		{
+			blop();
+		}
+
+		InstanceCounter(const InstanceCounter&) : InstanceCounter() {}
+		InstanceCounter(InstanceCounter&&) : InstanceCounter() {}
+
+		InstanceCounter& operator=(const InstanceCounter&) = default;
+		virtual ~InstanceCounter()
+		{
+			std::lock_guard<std::mutex> lock(info.mutex);
+			info.liveInstance--;
+		}
+
+	private:
+		void blop()
+		{
+			std::lock_guard<std::mutex> lock(info.mutex);
+			if (0 == info.totalInstance)
+			{
+				// don't take the global lock to often
+				std::lock_guard<std::mutex> lock(globalInstanceCounterMutex);
+				// const void *ptr = &typeid(T);
+				globalInstanceInfoMap[typeid(T).hash_code()] = &info;
+				info.name = typeid(T).name();
+			}
+			info.totalInstance++;
+			info.liveInstance++;
+		}
+
+	};
+
+	template<typename T> 
+	InstanceCounterInfo InstanceCounter<T>::info;
+
 	class IReferenceCounted
 	{
 	public:

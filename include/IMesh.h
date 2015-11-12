@@ -20,7 +20,7 @@ namespace scene
 	(IMeshBuffer). SMesh is a simple implementation of an IMesh.
 	A mesh is usually added to an IMeshSceneNode in order to be rendered.
 	*/
-	class IMesh : public virtual IReferenceCounted
+	class IMesh : public virtual IReferenceCounted, public InstanceCounter<IMesh>
 	{
 	public:
 

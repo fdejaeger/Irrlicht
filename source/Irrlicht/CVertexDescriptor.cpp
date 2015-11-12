@@ -6,6 +6,11 @@
 
 namespace irr
 {
+
+	std::mutex globalInstanceCounterMutex;
+	std::map<size_t, InstanceCounterInfo*> globalInstanceInfoMap;
+
+
 namespace video
 {
 

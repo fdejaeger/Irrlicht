@@ -38,7 +38,7 @@ namespace scene
 	passed to a video driver and only drop the buffer once it's not used in
 	the current code block anymore.
 	*/
-	class IMeshBuffer : public virtual IReferenceCounted
+	class IMeshBuffer : public virtual IReferenceCounted, public InstanceCounter<IMeshBuffer>
 	{
 	public:
 		IMeshBuffer(video::IVertexDescriptor* vertexDescriptor) : VertexDescriptor(vertexDescriptor), VertexBufferCompatible(true),

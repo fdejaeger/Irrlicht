@@ -54,6 +54,7 @@ endfunction()
 set(IRR_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(IRR_SRC_DIR "${IRR_ROOT_DIR}/source/Irrlicht")
 
+
 # Source files
 # -------------------------------------------------------------------------------------------------
 glob_c_cpp_sources(IRR_SRC_FILES ${IRR_SRC_DIR})
@@ -129,6 +130,8 @@ if(NOT ${IRRLICHT_SHARED})
 	target_compile_definitions(Irrlicht PUBLIC _IRR_STATIC_LIB_)
 endif()
 
+set_target_properties(Irrlicht PROPERTIES CXX_STANDARD 14 CXX_STANDARD_REQUIRED ON)
+
 # Per platform config
 # -------------------------------------------------------------------------------------------------
 
@@ -169,8 +172,8 @@ elseif(UNIX)
 		PRIVATE "-fno-strict-aliasing")
 
 	# Disable RTTI on C++ files only (no sense for C files)
-	set_source_files_properties(${IRR_SRC_FILES} ${IRR_SRC_FILES_AESGLADMAN}
-		PROPERTIES COMPILE_FLAGS "-fno-rtti")
+	# set_source_files_properties(${IRR_SRC_FILES} ${IRR_SRC_FILES_AESGLADMAN}
+	# 	PROPERTIES COMPILE_FLAGS "-fno-rtti")
 
 	# Debug macro
 	target_compile_options(Irrlicht PRIVATE $<$<CONFIG:Debug>:-D_DEBUG>)
